@@ -27,9 +27,9 @@ const getUserById = async (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
-  const { name, email } = req.body;
+  const { username, email } = req.body;
   try {
-    const user = await User.create({ name, email });
+    const user = await User.create({ username, email });
     res.status(201).json(user);
   } catch (error) {
     console.log(error); // Add console log here
@@ -40,9 +40,9 @@ const createUser = async (req, res) => {
 // Update a user by ID
 const updateUserById = async (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
+  const { username, email } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(id, { name, email }, { new: true });
+    const user = await User.findByIdAndUpdate(id, { username, email }, { new: true });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -68,40 +68,40 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-router.post('/api/users/:userId/friends/:friendId', async (req, res) => {
-  const { userId, friendId } = req.params;
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    // Add friendId to the user's friend list
-    user.friends.push(friendId);
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    console.log(error); // Add console log here
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// router.post('/api/users/:userId/friends/:friendId', async (req, res) => {
+//   const { userId, friendId } = req.params;
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+//     // Add friendId to the user's friend list
+//     user.friends.push(friendId);
+//     await user.save();
+//     res.json(user);
+//   } catch (error) {
+//     console.log(error); // Add console log here
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
-// Route to remove a friend from a user's friend list
-router.delete('/api/users/:userId/friends/:friendId', async (req, res) => {
-  const { userId, friendId } = req.params;
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    // Remove friendId from the user's friend list
-    user.friends = user.friends.filter((friend) => friend.toString() !== friendId);
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    console.log(error); // Add console log here
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// // Route to remove a friend from a user's friend list
+// router.delete('/api/users/:userId/friends/:friendId', async (req, res) => {
+//   const { userId, friendId } = req.params;
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+//     // Remove friendId from the user's friend list
+//     user.friends = user.friends.filter((friend) => friend.toString() !== friendId);
+//     await user.save();
+//     res.json(user);
+//   } catch (error) {
+//     console.log(error); // Add console log here
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 module.exports = {
   getAllUsers,

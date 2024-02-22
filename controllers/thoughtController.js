@@ -1,3 +1,5 @@
+const User = require('../models/thought.js');
+
 const getThoughts = async (req, res) => {
   try {
     console.log('getThoughts function called'); // Add console log here
@@ -24,14 +26,13 @@ const getThought = async (req, res) => {
 };
 
 const createThought = async (req, res) => {
+  const { thoughtText, username } = req.body;
   try {
-    console.log('createThought function called'); // Add console log here
-    const thought = new Thought(req.body);
-    await thought.save();
+    const Thought = await Thought.create({ thoughtText, username });
     res.status(201).json(thought);
   } catch (err) {
     console.error(err); // Add console error log here
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error, you fool' });
   }
 };
 
