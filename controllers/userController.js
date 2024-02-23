@@ -2,7 +2,7 @@ const User = require('../models/user.js');
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('thoughts');
     res.json(users);
   } catch (error) {
     console.log(error); // Add console log here
@@ -14,7 +14,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate('thoughts');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -68,40 +68,27 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-// router.post('/api/users/:userId/friends/:friendId', async (req, res) => {
-//   const { userId, friendId } = req.params;
-//   try {
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-//     // Add friendId to the user's friend list
-//     user.friends.push(friendId);
-//     await user.save();
-//     res.json(user);
-//   } catch (error) {
-//     console.log(error); // Add console log here
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
-
-// // Route to remove a friend from a user's friend list
-// router.delete('/api/users/:userId/friends/:friendId', async (req, res) => {
-//   const { userId, friendId } = req.params;
-//   try {
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-//     // Remove friendId from the user's friend list
-//     user.friends = user.friends.filter((friend) => friend.toString() !== friendId);
-//     await user.save();
-//     res.json(user);
-//   } catch (error) {
-//     console.log(error); // Add console log here
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
+// Create a route to add a friend to a user
+const addFriend = async (req, res) => {
+  const { id } = req.params;
+  try {
+    console.log('addFriend function called'); // Add console log here
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const friend = await User.findById(id);
+    if (!friend) {
+      return res.status(404).json({ error: 'Friend not found' });
+    }
+    user.friends.push(id);
+    await user.save();
+    res.status(200).json({ message: 'Friend added successfully' });
+  } catch (err) {
+    console.error(err); // Add console error log here
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -109,4 +96,5 @@ module.exports = {
   createUser,
   updateUserById,
   deleteUserById,
+  addFriend
 };
