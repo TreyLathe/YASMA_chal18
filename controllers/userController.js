@@ -2,7 +2,7 @@ const User = require('../models/user.js');
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate('thoughts');
+    const users = await User.find().populate('thoughts').populate('friends').select('-__v');
     res.json(users);
   } catch (error) {
     console.log(error); // Add console log here
@@ -14,7 +14,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findById(id).populate('thoughts');
+    const user = await User.findById(id).populate('thoughts').populate('friends').select('-__v');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -68,27 +68,36 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-// Create a route to add a friend to a user
 const addFriend = async (req, res) => {
-  const { id } = req.params;
+  const { userId, friendId } = req.params;
   try {
-    console.log('addFriend function called'); // Add console log here
-    const user = await User.findById(id);
+    const user = await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendId } }, { new: true });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    const friend = await User.findById(id);
-    if (!friend) {
-      return res.status(404).json({ error: 'Friend not found' });
-    }
-    user.friends.push(id);
-    await user.save();
-    res.status(200).json({ message: 'Friend added successfully' });
-  } catch (err) {
-    console.error(err); // Add console error log here
-    res.status(500).json({ error: 'Server error' });
+    res.json(user);
+  } catch (error) {
+    console.log(error); // Add console log here
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const deleteFriend = async (req, res) => {
+  const { userId, friendId } = req.params;
+  try {
+    const user = await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } }, { new: true });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.log(error); // Add console log here
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
 
 module.exports = {
   getAllUsers,
@@ -96,5 +105,6 @@ module.exports = {
   createUser,
   updateUserById,
   deleteUserById,
-  addFriend
+  addFriend,
+  deleteFriend
 };
