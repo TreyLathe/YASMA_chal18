@@ -3,7 +3,7 @@ const {Thought, User} = require('../models/');
 const getThoughts = async (req, res) => {
   try {
     console.log('getThoughts function called'); // Add console log here
-    const thoughts = await Thought.find().select('-__v').sort({ createdAt: -1 });
+    const thoughts = await Thought.find().populate('reactions').select('-__v').sort({ createdAt: -1 });
     res.status(200).json(thoughts);
   } catch (err) {
     console.error(err); // Add console error log here
@@ -72,10 +72,26 @@ const deleteThought = async (req, res) => {
   }
 };
 
+const addReaction = async (req, res) => {
+  const { thoughtId } = req.params;
+  console.log('thoughtId', thoughtId ); // Add console log here
+  try {
+    const thought = await Thought.findByIdAndUpdate(thoughtId, { $addToSet: { reactions: req.body } }, { new: true });
+    if (!thought) {
+      return res.status(404).json({ error: 'Thought not found' });
+    }
+    res.json(thought);
+  } catch (error) {
+    console.log(error); // Add console log here
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   getThoughts,
   getThought,
   createThought,
   updateThought,
   deleteThought,
+  addReaction
 };
