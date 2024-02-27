@@ -30,7 +30,8 @@ Technologies: mongoDB, mongoose, express, javascript
 - Deployed Site:  N/A
 
 ## SCREENSHOTS &&/|| SCREENCASTS:
-Screencast: 
+Screencast: https://app.screencastify.com/v3/watch/ob1C9oIK5owRBWko9Lr3
+
 
 ## USAGE && COMMENTS:
 GIVEN a social network API
